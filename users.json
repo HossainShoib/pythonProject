@@ -12,15 +12,21 @@
     "password": "123"
   },
   {
-    "user_id": 3,
-    "name": "Nowshin Sultana",
-    "email": "nowshin@gmail.com",
-    "password": "123"
-  },
-  {
     "user_id": 4,
     "name": "Prottoy Mirza",
     "email": "mirza@gmail.com",
+    "password": "123"
+  },
+  {
+    "user_id": 5,
+    "name": "samir",
+    "email": "smir@gmail.com",
+    "password": "smir234"
+  },
+  {
+    "user_id": 6,
+    "name": "kutta mizan",
+    "email": "mizan@gmail.com",
     "password": "123"
   }
 ]
