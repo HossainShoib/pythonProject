@@ -6,27 +6,21 @@
     "password": "123"
   },
   {
+    "user_id": 2,
+    "name": "Shoib Hossain",
+    "email": "shoib@putkifata.com",
+    "password": "123"
+  },
+  {
     "user_id": 3,
-    "name": "shoib hossain",
-    "email": "shoib@gmail.com",
+    "name": "Nowshin Sultana",
+    "email": "nowshin@gmail.com",
     "password": "123"
   },
   {
     "user_id": 4,
-    "name": "Nowshin",
-    "email": "now@gmail.com",
-    "password": "s123"
-  },
-  {
-    "user_id": 5,
-    "name": "siyam",
-    "email": "se@gmail.com",
-    "password": "se1233"
-  },
-  {
-    "user_id": 6,
-    "name": "sakil",
-    "email": "sakil@gmail.com",
-    "password": "sakil22"
+    "name": "Prottoy Mirza",
+    "email": "mirza@gmail.com",
+    "password": "123"
   }
 ]
