@@ -145,7 +145,7 @@ class UserCRUD:
 
 def display_users_table(users):
     table = PrettyTable()
-    table.field_names = ["User ID", "Name", "Email", "Password"]
+    table.field_names = ["Account Number", "Name", "Email", "Password"]
 
     for user in users:
         table.add_row([user.user_id, user.name, user.email, user.password])
@@ -155,7 +155,7 @@ def display_users_table(users):
 
 def display_user_details(user):
     table = PrettyTable()
-    table.field_names = ["User ID", "Name", "Email", "Password", "Balance"]
+    table.field_names = ["Account Number", "Name", "Email", "Password", "Balance"]
 
     table.add_row([user.user_id, user.name, user.email, user.password, user.balance])
 
@@ -180,7 +180,7 @@ def display_transaction_history(transactions):
 
 
 # Main Program
-#user_crud = UserCRUD()
+user_crud = UserCRUD()
 print("Welcome to the User Management System!")
 
 while True:
