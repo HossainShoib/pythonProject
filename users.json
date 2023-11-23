@@ -1,0 +1,17 @@
+[
+  {
+    "user_id": 1,
+    "name": "sakib ishtiaq",
+    "email": "sakib@hotmaiil.com"
+  },
+  {
+    "user_id": 2,
+    "name": "Prottoy Mirza",
+    "email": "prottoy@gmail.com"
+  },
+  {
+    "user_id": 3,
+    "name": "shoib hossain",
+    "email": "shoib@gmail.com"
+  }
+]
