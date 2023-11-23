@@ -1,17 +1,30 @@
 import json
 from prettytable import PrettyTable
+from datetime import datetime
+
+
+class Transaction:
+    transaction_id_counter = 1
+
+    def __init__(self, transaction_type, amount):
+        self.transaction_id = Transaction.transaction_id_counter
+        Transaction.transaction_id_counter += 1
+        self.transaction_type = transaction_type
+        self.amount = amount
+        self.timestamp = datetime.now().isoformat()
 
 
 class User:
-    def __init__(self, user_id, name, email, password , balance=0.0):
+    def __init__(self, user_id, name, email, password, balance=0.0, transactions=None):
         self.user_id = user_id
         self.name = name
         self.email = email
         self.password = password
         self.balance = balance
+        self.transactions = transactions or []
 
     def __str__(self):
-        return f"User(user_id={self.user_id}, name='{self.name}', email='{self.email}', password='{self.password}')"
+        return f"User(user_id={self.user_id}, name='{self.name}', email='{self.email}', password='{self.password}', balance={self.balance}, transactions={self.transactions})"
 
 
 class UserCRUD:
@@ -22,10 +35,22 @@ class UserCRUD:
             max(user.user_id for user in self.users) + 1 if self.users else 1
         )
 
+    def read_users(self):
+        return self.users
+
+    def create_user(self, name, email, password):
+        new_user = User(self.next_user_id, name, email, password)
+        self.next_user_id += 1
+        self.users.append(new_user)
+        self.save_users_to_file()
+        return new_user
+
     def deposit(self, user_id, amount):
         for user in self.users:
             if user.user_id == user_id:
                 user.balance += amount
+                transaction = Transaction("Deposit", amount)
+                user.transactions.append(transaction)
                 self.save_users_to_file()
                 return user
         return None
@@ -34,6 +59,8 @@ class UserCRUD:
         for user in self.users:
             if user.user_id == user_id and user.balance >= amount:
                 user.balance -= amount
+                transaction = Transaction("Withdrawal", amount)
+                user.transactions.append(transaction)
                 self.save_users_to_file()
                 return user
         return None
@@ -42,15 +69,10 @@ class UserCRUD:
         try:
             with open(self.filename, "r") as file:
                 users_data = json.load(file)
-                return [
-                    User(
-                        user_data["user_id"],
-                        user_data["name"],
-                        user_data["email"],
-                        user_data["password"],
-                    )
-                    for user_data in users_data
-                ]
+                users = [User(**user_data) for user_data in users_data]
+                for user in users:
+                    user.transactions = self.load_transactions_from_file(user.user_id)
+                return users
         except FileNotFoundError:
             return []
 
@@ -64,25 +86,44 @@ class UserCRUD:
             }
             for user in self.users
         ]
-        with open(self.filename, "w") as file:
+        with open(self.filename, "w") as file:  # Use 'w' to write and overwrite existing data
             json.dump(users_data, file, indent=2)
 
-    def create_user(self, name, email, password):
-        new_user = User(self.next_user_id, name, email, password)
-        self.next_user_id += 1
-        self.users.append(new_user)
-        self.save_users_to_file()
-        return new_user
+    def load_transactions_from_file(self, user_id):
+        filename = f"user_{user_id}_transactions.json"
+        try:
+            with open(filename, "r") as file:
+                transactions_data = json.load(file)
+                return [
+                    Transaction(**transaction_data)
+                    for transaction_data in transactions_data
+                ]
+        except FileNotFoundError:
+            return []
 
-    def read_users(self):
-        return self.users
+    def save_transactions_to_file(self, user_id, transactions):
+        filename = f"user_{user_id}_transactions.json"
+        transactions_data = [
+            {
+                "transaction_id": transaction.transaction_id,
+                "transaction_type": transaction.transaction_type,
+                "amount": transaction.amount,
+                "timestamp": transaction.timestamp,
+            }
+            for transaction in transactions
+        ]
+        with open(filename, "w") as file:
+            json.dump(transactions_data, file, indent=2)
 
-    def update_user(self, user_id, name, email, password):
+    def update_user(self, user_id, name=None, email=None, password=None):
         for user in self.users:
             if user.user_id == user_id:
-                user.name = name
-                user.email = email
-                user.password = password
+                if name:
+                    user.name = name
+                if email:
+                    user.email = email
+                if password:
+                    user.password = password
                 self.save_users_to_file()
                 return user
         return None
@@ -114,14 +155,32 @@ def display_users_table(users):
 
 def display_user_details(user):
     table = PrettyTable()
-    table.field_names = ["User ID", "Name", "Email"]
+    table.field_names = ["User ID", "Name", "Email", "Password", "Balance"]
 
-    table.add_row([user.user_id, user.name, user.email])
+    table.add_row([user.user_id, user.name, user.email, user.password, user.balance])
+
+    print(table)
+
+
+def display_transaction_history(transactions):
+    table = PrettyTable()
+    table.field_names = ["Transaction ID", "Type", "Amount", "Timestamp"]
+
+    for transaction in transactions:
+        table.add_row(
+            [
+                transaction.transaction_id,
+                transaction.transaction_type,
+                transaction.amount,
+                transaction.timestamp,
+            ]
+        )
 
     print(table)
 
 
 # Main Program
+#user_crud = UserCRUD()
 print("Welcome to the User Management System!")
 
 while True:
@@ -138,7 +197,6 @@ while True:
         email = input("Enter your email: ")
         password = input("Enter your password: ")
 
-        user_crud = UserCRUD()
         user_crud.create_user(name, email, password)
         print("User registered successfully!")
 
@@ -146,7 +204,6 @@ while True:
         email = input("Enter your email: ")
         password = input("Enter your password: ")
 
-        user_crud = UserCRUD()
         logged_in_user = user_crud.login(email, password)
 
         if logged_in_user:
@@ -161,8 +218,9 @@ while True:
                 print("4. Withdraw Money")
                 print("5. Delete Your Account")
                 print("6. Logout")
+                print("7. View Transaction History")
 
-                user_option = input("Enter your choice (1-6): ")
+                user_option = input("Enter your choice (1-7): ")
 
                 if user_option == "1":
                     display_user_details(logged_in_user)
@@ -178,15 +236,6 @@ while True:
                         "Enter the updated password (press Enter to keep the existing password): "
                     )
 
-                    if not name.strip():
-                        name = logged_in_user.name
-
-                    if not email.strip():
-                        email = logged_in_user.email
-
-                    if not password.strip():
-                        password = logged_in_user.password
-
                     updated_user = user_crud.update_user(
                         logged_in_user.user_id, name, email, password
                     )
@@ -201,8 +250,12 @@ while True:
                     try:
                         amount = float(input("Enter the amount to deposit: "))
                         if amount > 0:
-                            logged_in_user = user_crud.deposit(logged_in_user.user_id, amount)
-                            print(f"Deposit of {amount} successful. New balance: {logged_in_user.balance}")
+                            logged_in_user = user_crud.deposit(
+                                logged_in_user.user_id, amount
+                            )
+                            print(
+                                f"Deposit of {amount} successful. New balance: {logged_in_user.balance}"
+                            )
                         else:
                             print("Invalid amount. Please enter a positive value.")
                     except ValueError:
@@ -213,8 +266,12 @@ while True:
                         amount = float(input("Enter the amount to withdraw: "))
                         if amount > 0:
                             if logged_in_user.balance >= amount:
-                                logged_in_user = user_crud.withdraw(logged_in_user.user_id, amount)
-                                print(f"Withdrawal of {amount} successful. New balance: {logged_in_user.balance}")
+                                logged_in_user = user_crud.withdraw(
+                                    logged_in_user.user_id, amount
+                                )
+                                print(
+                                    f"Withdrawal of {amount} successful. New balance: {logged_in_user.balance}"
+                                )
                             else:
                                 print("Insufficient funds.")
                         else:
@@ -240,8 +297,11 @@ while True:
                     print("Logging out. Goodbye!")
                     break
 
+                elif user_option == "7":
+                    display_transaction_history(logged_in_user.transactions)
+
                 else:
-                    print("Invalid choice. Please enter a number between 1 and 6.")
+                    print("Invalid choice. Please enter a number between 1 and 7.")
 
         else:
             print("Login failed. Invalid email or password.")
@@ -252,8 +312,6 @@ while True:
 
         if admin_username == "admin" and admin_password == "password":
             print("Admin login successful. Welcome, admin!")
-
-            user_crud = UserCRUD()
 
             while True:
                 print("\nAdmin Options:")
@@ -274,8 +332,18 @@ while True:
 
                 elif admin_choice == "2":
                     user_id = int(input("Enter the user ID to update: "))
-                    name, email, password = user_registration()
+                    name = input(
+                        "Enter the updated name (press Enter to keep the existing name): "
+                    )
+                    email = input(
+                        "Enter the updated email (press Enter to keep the existing email): "
+                    )
+                    password = input(
+                        "Enter the updated password (press Enter to keep the existing password): "
+                    )
+
                     updated_user = user_crud.update_user(user_id, name, email, password)
+
                     if updated_user:
                         print("User updated successfully!")
                         display_users_table([updated_user])
