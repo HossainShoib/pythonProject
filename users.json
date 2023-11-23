@@ -1,17 +1,26 @@
 [
   {
     "user_id": 1,
-    "name": "sakib ishtiaq",
-    "email": "sakib@hotmaiil.com"
+    "name": "Sakib Shahriyar",
+    "email": "saku@gmail.com",
+    "password": "123"
   },
   {
     "user_id": 2,
-    "name": "Prottoy Mirza",
-    "email": "prottoy@gmail.com"
+    "name": "Shoib Hossain",
+    "email": "shoib@putkifata.com",
+    "password": "123"
   },
   {
     "user_id": 3,
-    "name": "shoib hossain",
-    "email": "shoib@gmail.com"
+    "name": "Nowshin Sultana",
+    "email": "nowshin@gmail.com",
+    "password": "123"
+  },
+  {
+    "user_id": 4,
+    "name": "Prottoy Mirza",
+    "email": "mirza@gmail.com",
+    "password": "123"
   }
 ]
