@@ -1,0 +1,32 @@
+[
+  {
+    "user_id": 1,
+    "name": "Sakib Shahriyar",
+    "email": "saku@gmail.com",
+    "password": "123"
+  },
+  {
+    "user_id": 3,
+    "name": "shoib hossain",
+    "email": "shoib@gmail.com",
+    "password": "123"
+  },
+  {
+    "user_id": 4,
+    "name": "Nowshin",
+    "email": "now@gmail.com",
+    "password": "s123"
+  },
+  {
+    "user_id": 5,
+    "name": "siyam",
+    "email": "se@gmail.com",
+    "password": "se1233"
+  },
+  {
+    "user_id": 6,
+    "name": "sakil",
+    "email": "sakil@gmail.com",
+    "password": "sakil22"
+  }
+]
